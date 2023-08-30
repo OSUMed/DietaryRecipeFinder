@@ -16,9 +16,11 @@ import com.example.assignment_9.dto.Recipe;
 @Service
 public class FileService {
 
+	// Collect file name through application.properties:
 	@Value("${file.name}")
 	private String fileName;
 
+	// Process file using CommonCSV Dependency, then use results to create Recipe POGOs:
 	public List<Recipe> loadData(){
 		List<CSVRecord> data = null;
 		try {
@@ -31,7 +33,7 @@ public class FileService {
 	}
 
 	private List<Recipe> makeRecipeObjects(List<CSVRecord> data) {
-		// TODO Auto-generated method stub
+		// Create and collect Recipe Objects:
 		List<Recipe> recipes = new ArrayList<>();
 		for (CSVRecord record : data) {
 			Recipe recipe = new Recipe();
@@ -55,24 +57,24 @@ public class FileService {
 	}
 
 	public List<CSVRecord> processFile() throws IOException {
-		// TODO Auto-generated method stub
 
 		System.out.println("inside process file " + fileName);
 		List<CSVRecord> fileContent = new ArrayList<>();
-//		Reader in = new FileReader("recipes.txt");
 		Reader in = new FileReader(fileName);
+		
+		// Use withEscape() to skip escape characters in text file(line 17, etc). 
+		// Use withIgnoreSurroundingSpaces for correct parsing( commas inside parenthesis should not split substring )
+		// use Header so our values are mapped to the headers thus we can use record.get() when making POGOs:
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader("Cooking Minutes", "Dairy Free", "Gluten Free",
 				"Instructions", "Preparation Minutes", "Price Per Serving", "Ready In Minutes", "Servings",
 				"Spoonacular Score", "Title", "Vegan", "Vegetarian").withIgnoreSurroundingSpaces().withEscape('\\')
 				.parse(in);
 		Boolean lineOne = true;
-//		Integer counter = 0;
 		for (CSVRecord record : records) {
 			if (lineOne) {
 				lineOne = false;
 				continue;
 			}
-//			counter++;
 			fileContent.add(record);
 		}
 
